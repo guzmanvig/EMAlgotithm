@@ -1,17 +1,29 @@
+"""
+Runs the algorithm 100 times and calculates the mean and variance of the results of each run
+"""
+
 import numpy as np
 
-from EM_methods import generate_mixed_data, plot_data, EM_estimation
+from EM_classic_methods import generate_mixed_data, EM_estimation
 
 mu1_true, sigma1_true = 35, 5
 mu2_true, sigma2_true = 23, 3
 beta = 0.4
+parameter_threshold = 0.00001
 n = 1000
-parameter_threshold = 0.001
+# n = 100
 
+
+# Here we will store the results
 w1_all, w2_all, mu1_all, mu2_all, sigma1_all, sigma2_all, step_all = [], [], [], [], [], [], []
+
 for i in range(0, 100):
     print("Run: ", i)
+    # Generate data each time and run the algorithm
     Dy = generate_mixed_data(mu1_true, sigma1_true, mu2_true, sigma2_true, beta, n)
+
+    # Estimate the parameters using EM. The parameter threshold indicates that the algorithm will stop once all the
+    # parameters don't change more than that threshold
     w1, w2, mu1, mu2, sigma1, sigma2, step = EM_estimation(Dy, parameter_threshold)
 
     # Sets (w1, mu1, sigma1) from this run might not correspond to the same (w1, mu1, sigma1) from before runs,
