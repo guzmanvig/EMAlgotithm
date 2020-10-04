@@ -6,7 +6,7 @@ import numpy as np
 
 from EM_classic_methods import generate_mixed_data, EM_estimation
 
-mu1_true, sigma1_true = 35, 5
+mu1_true, sigma1_true = 38, 5
 mu2_true, sigma2_true = 23, 3
 beta = 0.4
 parameter_threshold = 0.00001

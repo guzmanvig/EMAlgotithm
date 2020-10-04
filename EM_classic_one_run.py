@@ -4,11 +4,12 @@ Runs EM algorithm one time and reports the result
 
 from EM_classic_methods import generate_mixed_data, plot_data, EM_estimation
 
-mu1_true, sigma1_true = 18, 8
-mu2_true, sigma2_true = 9, 2
+mu1_true, sigma1_true = 38, 5
+mu2_true, sigma2_true = 23, 3
+beta = 0.4
 beta = 0.3
+parameter_threshold = 0.0001
 n = 1000
-parameter_threshold = 0.001
 
 # Generates n data points from two gaussians with weights beta and 1 - beta
 Dy = generate_mixed_data(mu1_true, sigma1_true, mu2_true, sigma2_true, beta, n)
