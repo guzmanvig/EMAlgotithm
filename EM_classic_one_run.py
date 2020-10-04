@@ -6,9 +6,10 @@ from EM_classic_methods import generate_mixed_data, plot_data, EM_estimation
 
 mu1_true, sigma1_true = 38, 5
 mu2_true, sigma2_true = 23, 3
-beta = 0.4
 beta = 0.3
-parameter_threshold = 0.0001
+parameter_stop_criteria = 0.001
+min_steps = 50
+max_steps = 5000
 n = 1000
 
 # Generates n data points from two gaussians with weights beta and 1 - beta
@@ -17,9 +18,9 @@ Dy = generate_mixed_data(mu1_true, sigma1_true, mu2_true, sigma2_true, beta, n)
 # Plots the data
 plot_data(Dy, mu1_true, sigma1_true, mu2_true, sigma2_true)
 
-# Estimate the parameters using EM. The parameter threshold indicates that the algorithm will stop once all the
-# parameters don't change more than that threshold
-w1, w2, mu1, mu2, sigma1, sigma2, step = EM_estimation(Dy, parameter_threshold)
+# Estimate the parameters using EM. The stop criteria indicates that the algorithm will stop once all the
+# parameters don't change more than that value (in percentage)
+w1, w2, mu1, mu2, sigma1, sigma2, step = EM_estimation(Dy, parameter_stop_criteria, min_steps, max_steps)
 
 print("Estimation finished!")
 print("Steps: " + str(step))

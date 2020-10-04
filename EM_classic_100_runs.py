@@ -9,9 +9,11 @@ from EM_classic_methods import generate_mixed_data, EM_estimation
 mu1_true, sigma1_true = 38, 5
 mu2_true, sigma2_true = 23, 3
 beta = 0.4
-parameter_threshold = 0.00001
-n = 1000
-# n = 100
+parameter_stop_criteria = 0.001
+min_steps = 50
+max_steps = 5000
+# n = 1000
+n = 100
 
 
 # Here we will store the results
@@ -22,9 +24,9 @@ for i in range(0, 100):
     # Generate data each time and run the algorithm
     Dy = generate_mixed_data(mu1_true, sigma1_true, mu2_true, sigma2_true, beta, n)
 
-    # Estimate the parameters using EM. The parameter threshold indicates that the algorithm will stop once all the
-    # parameters don't change more than that threshold
-    w1, w2, mu1, mu2, sigma1, sigma2, step = EM_estimation(Dy, parameter_threshold)
+    # Estimate the parameters using EM. The stop criteria indicates that the algorithm will stop once all the
+    # parameters don't change more than that value (in percentage)
+    w1, w2, mu1, mu2, sigma1, sigma2, step = EM_estimation(Dy, parameter_stop_criteria, min_steps, max_steps)
 
     # Sets (w1, mu1, sigma1) from this run might not correspond to the same (w1, mu1, sigma1) from before runs,
     # so we need to check to which group it is more likely they belong. We use mu to check since mus are more likely to

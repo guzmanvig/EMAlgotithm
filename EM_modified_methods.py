@@ -76,9 +76,10 @@ def calculate_next_sigma(i, sum_py1_x, mu_i_next, data_x, sum_py1_y, data_y, mu1
 
 # EM algorithm modified to use two sets of data that comes from the mixture of the same two gaussians, but each
 # with different weights. The parameter of those two gaussians along with the weights of each is the return values of
-# the algorithm. The parameter threshold indicates when the algorithm should stop, i.e.: when the parameters don't
-# change more than that value.
-def EM_modified_estimation(data_x, data_y, parameter_threshold):
+# the algorithm. The stop criteria indicates when the algorithm should stop, i.e.: when the parameters don't
+# change more than that value (in percentage).
+# The algorithm will run for at least min_steps and at most max_steps.
+def EM_modified_estimation(data_x, data_y, parameter_stop_criteria, min_steps, max_steps):
     # Initialize and the weights as 0.5
     w1_x, w2_x, w1_y, w2_y = 0.5, 0.5, 0.5, 0.5
 
@@ -93,6 +94,7 @@ def EM_modified_estimation(data_x, data_y, parameter_threshold):
     sigma2 = np.var(random_sample)
 
     step = 0
+    a = False
     while True:
         # Calculate the "t+1" parameters by applying the update rules
         w1_x_next, sum_py1_x = calculate_next_weight(1, data_x, mu1, sigma1, mu2, sigma2, w1_x, w2_x)
@@ -106,15 +108,15 @@ def EM_modified_estimation(data_x, data_y, parameter_threshold):
         sigma1_next = calculate_next_sigma(1, sum_py1_x, mu1_next, data_x, sum_py1_y, data_y, mu1, sigma1, mu2, sigma2, w1_x, w2_x, w1_y, w2_y)
         sigma2_next = calculate_next_sigma(2, sum_py2_x, mu2_next, data_x, sum_py2_y, data_y, mu1, sigma1, mu2, sigma2, w1_x, w2_x, w1_y, w2_y)
 
-        # Stop if all the parameter of "t+1" vary from the ones of "t" less than the threshold
-        stop = abs(w1_x - w1_x_next) < parameter_threshold and \
-               abs(w2_x - w2_x_next) < parameter_threshold and \
-               abs(w1_y - w1_y_next) < parameter_threshold and \
-               abs(w2_y - w2_y_next) < parameter_threshold and \
-               abs(mu1 - mu1_next) < parameter_threshold and \
-               abs(mu2 - mu2_next) < parameter_threshold and \
-               abs(sigma1 - sigma1_next) < parameter_threshold and \
-               abs(sigma2 - sigma2_next) < parameter_threshold
+        # Stop if all the parameter of "t+1" vary from the ones of "t" less than the criteria
+        stop = (abs(w1_x - w1_x_next) / w1_x * 100) < parameter_stop_criteria and \
+               (abs(w2_x - w2_x_next) / w2_x * 100) < parameter_stop_criteria and \
+               (abs(w1_y - w1_y_next) / w1_y * 100) < parameter_stop_criteria and \
+               (abs(w2_y - w2_y_next) / w2_y * 100) < parameter_stop_criteria and \
+               (abs(mu1 - mu1_next) / mu1 * 100) < parameter_stop_criteria and \
+               (abs(mu2 - mu2_next) / mu2 * 100) < parameter_stop_criteria and \
+               (abs(sigma1 - sigma1_next) / sigma1 * 100) < parameter_stop_criteria and \
+               (abs(sigma2 - sigma2_next) / sigma2 * 100) < parameter_stop_criteria
 
         # Assign "t+1" parameters to "t" parameters
         w1_x = w1_x_next
@@ -127,5 +129,9 @@ def EM_modified_estimation(data_x, data_y, parameter_threshold):
         sigma2 = sigma2_next
 
         step += 1
-        if stop:
+
+        if stop and step > min_steps:
             return w1_x, w2_x, w1_y, w2_y, mu1, mu2, sigma1, sigma2, step
+        elif step > max_steps:
+            return w1_x, w2_x, w1_y, w2_y, mu1, mu2, sigma1, sigma2, step
+

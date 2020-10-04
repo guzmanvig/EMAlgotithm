@@ -11,9 +11,11 @@ mu1_true, sigma1_true = 38, 5
 mu2_true, sigma2_true = 23, 3
 beta = 0.4
 alpha = 0.5
-parameter_threshold = 0.0001
-n = 1000
-# n = 100
+parameter_stop_criteria = 0.001
+min_steps = 50
+max_steps = 5000
+# n = 1000
+n = 100
 
 # Here we will store the results. x denotes the weights for distribution Px and y the weights for distribution Py.
 w1_x_all, w2_x_all, w1_y_all, w2_y_all, mu1_all, mu2_all, sigma1_all, sigma2_all, step_all = [], [], [], [], [], [], [], [], []
@@ -24,9 +26,9 @@ for i in range(0, 100):
     Dy = generate_mixed_data(mu1_true, sigma1_true, mu2_true, sigma2_true, beta, n)
     Dx = generate_mixed_data(mu1_true, sigma1_true, mu2_true, sigma2_true, alpha, n)
 
-    # Estimate the parameters using EM with both sets of data. The parameter threshold indicates that the algorithm will
-    # stop once all the parameters don't change more than that threshold.
-    w1_x, w2_x, w1_y, w2_y, mu1, mu2, sigma1, sigma2, step = EM_modified_estimation(Dx, Dy, parameter_threshold)
+    # Estimate the parameters using EM with both sets of data. The stop criteria indicates that the algorithm will
+    # stop once all the parameters don't change more than that value (in percentage).
+    w1_x, w2_x, w1_y, w2_y, mu1, mu2, sigma1, sigma2, step = EM_modified_estimation(Dx, Dy, parameter_stop_criteria, min_steps, max_steps)
 
     # Sets (w1_x, w2_x mu1, sigma1) from this run might not correspond to the same (w1_x, w2_x mu1, sigma1) from before
     # runs, we need to check to which group it is more likely they belong. We use mu to check since mus are more likely

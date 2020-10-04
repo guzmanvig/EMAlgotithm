@@ -78,9 +78,10 @@ def calculate_next_sigma(i, sum_py_i, mu_i_next, data, mu1, sigma1, mu2, sigma2,
 
 
 # EM algorithm. data is the data points that come from the mixture of two gaussians. The parameter of those two gaussians
-# along with the weights of each is the return of the algorithm. The parameter threshold indicates when the algorithm
-# should stop, i.e.: when the parameters don't change more than that value.
-def EM_estimation(data, parameter_threshold):
+# along with the weights of each is the return of the algorithm. The stop criteria indicates when the algorithm
+# should stop, i.e.: when the parameters don't change more than that value (in percentage).
+# The algorithm will run for at least min_steps and at most max_steps.
+def EM_estimation(data, parameter_stop_criteria, min_steps, max_steps):
 
     # Initialize and the weights as 0.5
     w1, w2 = 0.5, 0.5
@@ -107,13 +108,13 @@ def EM_estimation(data, parameter_threshold):
         sigma1_next = calculate_next_sigma(1, sum_py_1, mu1_next, data, mu1, sigma1, mu2, sigma2, w1, w2)
         sigma2_next = calculate_next_sigma(2, sum_py_2, mu2_next, data, mu1, sigma1, mu2, sigma2, w1, w2)
 
-        # Stop if all the parameter of "t+1" vary from the ones of "t" less than the threshold
-        stop = abs(w1 - w1_next) < parameter_threshold and \
-               abs(w2 - w2_next) < parameter_threshold and \
-               abs(mu1 - mu1_next) < parameter_threshold and \
-               abs(mu2 - mu2_next) < parameter_threshold and \
-               abs(sigma1 - sigma1_next) < parameter_threshold and \
-               abs(sigma2 - sigma2_next) < parameter_threshold
+        # Stop if all the parameter of "t+1" vary from the ones of "t" less than the criteria
+        stop = (abs(w1 - w1_next) / w1 * 100) < parameter_stop_criteria and \
+               (abs(w2 - w2_next) / w2 * 100) < parameter_stop_criteria and \
+               (abs(mu1 - mu1_next) / mu1 * 100) < parameter_stop_criteria and \
+               (abs(mu2 - mu2_next) / mu2 * 100) < parameter_stop_criteria and \
+               (abs(sigma1 - sigma1_next) / sigma1 * 100) < parameter_stop_criteria and \
+               (abs(sigma2 - sigma2_next) / sigma2 * 100) < parameter_stop_criteria
 
         # Assign "t+1" parameters to "t" parameters
         w1 = w1_next
@@ -124,5 +125,8 @@ def EM_estimation(data, parameter_threshold):
         sigma2 = sigma2_next
 
         step += 1
-        if stop:
+
+        if stop and step > min_steps:
+            return w1, w2, mu1, mu2, sigma1, sigma2, step
+        elif step > max_steps:
             return w1, w2, mu1, mu2, sigma1, sigma2, step
